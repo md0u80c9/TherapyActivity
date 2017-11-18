@@ -1,0 +1,29 @@
+Package: sthktherapyactivity
+Type: Package
+Title: Plot therapy activities
+Version: 0.0.1
+Author: Andrew Hill
+Maintainer: Andrew Hill <andrew.hill@doctors.org.uk>
+Description: Plotting stroke therapy activity
+License: Mozilla Public License
+Encoding: UTF-8
+LazyData: true
+Depends:
+    R (>= 3.4.2)
+Imports:
+    ggplot2 (>= 2.2.1),
+    scales (>= 0.5.0),
+    tidyr (>= 0.7.2),
+    readr (>= 1.1.1),
+    tibble (>= 1.3.4),
+    chron (>= 2.3),
+    utils (>= 3.4.2)
+URL: http://www.strokeaudit.org
+BugReports: http://www.strokeaudit.org
+Collate:
+    'summarisedata.R'
+    'calendarheatmap.R'
+RoxygenNote: 6.0.1
+Suggests: 
+    testthat,
+    roxygen2
