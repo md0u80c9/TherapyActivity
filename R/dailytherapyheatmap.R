@@ -33,14 +33,30 @@ summarisedata <- function() {
                                          minutes = readr::col_integer(),
                                          unwell = readr::col_logical()
                                          ))
+  ottable <- readr::read_csv('../STHKOT.csv',
+                             col_names = TRUE,
+                             readr::cols(hospitalid = readr::col_character(),
+                                         name =  readr::col_character(),
+                                         ward = readr::col_factor(levels = c('5C', '5D')),
+                                         date = readr::col_date(format = "%d/%m/%Y"),
+                                         minutes = readr::col_integer(),
+                                         unwell = readr::col_logical()
+                             ))
   
-  groupedpt <- dplyr::group_by(pttable, hospitalid, name, ward)
-  summarypt <- dplyr::summarise(groupedpt, mins = median(minutes), days = sum(minutes > 0), sickdays = sum((minutes == 0) & unwell))
-  
-  ptgroupeddate <- dplyr::group_by(pttable, date)
-  ptsummarydate <- dplyr::summarise(ptgroupeddate, minsprovided = sum(minutes), need = n() * 45, pcprovided = sum(minutes) / (n() * 45) * 100)
-  
-  calendarHeat(ptsummarydate$date, ptsummarydate$pcprovided, varname="Percent of physio need met")
+# Cap the minutes at 45 for all the graphical work, and remove days when the patient was unwell.
+  pttable$minutes <- ifelse(pttable$minutes > 45,
+                            45,
+                            pttable$minutes)
+  pttable$minutes <- ifelse(pttable$unwell,
+                            NA,
+                            pttable$minutes)
+
+  ottable$minutes <- ifelse(ottable$minutes > 45,
+                            45,
+                            pttable$minutes)
+  ottable$minutes <- ifelse(ottable$unwell,
+                            NA,
+                            pttable$minutes)
   
   ptptson5D = dplyr::select(pttable, hospitalid, ward, date)
   ptptson5D = dplyr::filter(ptptson5D, ward == '5D')
@@ -51,23 +67,30 @@ summarisedata <- function() {
   # TODO: If the patient hasn't spent any days on 5D, then we need to set the clock as the last day on 5C + 1 day.
   ptrehabdays <- dplyr::mutate(ptrehabdays,
                                daynumber = as.integer(difftime(date, firstdayon5D, units = 'days')))
-#  ptrehabdays <- dplyr::mutate(ptrehabdays, minutes = scales::rescale(minutes))
-  ptrehabdays$minutes <- ifelse(ptrehabdays$unwell,
-                                NA,
-                                ptrehabdays$minutes)
-  
+  ptrehabdays <- dplyr::mutate(ptrehabdays,
+                               minutes = scales::rescale(minutes),
+                               minutes2 = minutes)
+
   ptrehabdays <- dplyr::select(ptrehabdays, -ward, -date, -firstdayon5D, -unwell)
 
   p <- ggplot2::ggplot(ptrehabdays,
                        ggplot2::aes(daynumber,
                                     hospitalid)) +
        ggplot2::theme_classic() +
-       ggplot2::geom_tile(ggplot2::aes(fill = minutes),
+       ggplot2::geom_tile(ggplot2::aes(fill = minutes2),
+                          data = ptrehabdays,
                           colour = "white") +
        ggplot2::scale_fill_gradientn(colours = c("#deebf7", "#9ecae1", "#3182bd"),
-                                     limits = c(0, 45),
+                                     values = c(0, 0.5, 1),
+                                     limits = c(0, 1),
                                      space = 'Lab',
-                                     na.value = 'white') +
+                                     na.value = 'white',
+                                     guide = 'colourbar') +
+    
+      ggplot2::geom_tile(ggplot2::aes(fill = minutes3),
+                       data = ptrehabdays,
+                       colour = "white") +
+    
 #       ggplot2::scale_fill_gradientn(low = "red",
 #                                     mid = "yellow",
 #                                     high = "green",
