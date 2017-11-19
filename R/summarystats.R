@@ -21,7 +21,7 @@
 
 #' @author Andrew Hill, \email{andrew.hill@@doctors.org.uk}
 
-summarisedata <- function() {
+summarystats <- function() {
 
 # TEST CODE - used to test the function with sample data. Remove from any production code
   pttable <- readr::read_csv('../STHKPT.csv',

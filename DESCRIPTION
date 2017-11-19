@@ -25,6 +25,8 @@ Collate:
     'therapyactivitycalendar.R'
     'calendarheatmap.R'
     'dailytherapyheatmap.R'
+    'CopyOfdailytherapyheatmap.R'
+    'summarystats.R'
 RoxygenNote: 6.0.1
 Suggests: 
     testthat,

@@ -21,7 +21,7 @@
 
 #' @author Andrew Hill, \email{andrew.hill@@doctors.org.uk}
 
-dailytherapyheatmap <- function() {
+olddailytherapyheatmap <- function() {
 
 # TEST CODE - used to test the function with sample data. Remove from any production code
   pttable <- readr::read_csv('../STHKPT.csv',
@@ -91,26 +91,30 @@ dailytherapyheatmap <- function() {
   p <- ggplot2::ggplot(therapyrehabdays,
                        ggplot2::aes(daynumber,
                                     hospitalid)) +
+       ggplot2::theme_classic() +
        ggplot2::geom_tile(ggplot2::aes(fill = scaledptminutes),
                           data = therapyrehabdays,
                           colour = "white") +
-       ggplot2::scale_fill_gradient(low = "#deebf7",
-                                    high = "#3182bd",
-                                    na.value = NA) +
-       ggplot2::scale_x_continuous(breaks = NULL, minor_breaks = NULL) +
-       ggplot2::xlab('Days of admission (the vertical line represents the day of transfer from HASU to ASU)') +
-#         minor_breaks = seq(-100, + 100, 200)) +
-#       ggplot2::scale_x_discrete("", expand = c(0,0)) +
-       ggplot2::scale_y_discrete("", expand = c(0,0)) +
-    ggplot2::ggtitle('Daily therapy activity broken down by patient') +
-    ggplot2::theme(legend.position = 'right',
-                   panel.background = ggplot2::element_rect(fill = NA),
-                   panel.grid.major = ggplot2::element_line(colour = "black")) +
-#                   axis.ticks = ggplot2::element_blank(),
-#                   axis.text.x = ggplot2::element_text(angle = 330, hjust = 0)) +
+       ggplot2::scale_fill_gradient2(low = "#deebf7",
+                                     mid = "#9ecae1",
+                                     high = "#3182bd",
+                                     breaks = c(min(therapyrehabdays$ptminutes), max(therapyrehabdays$ptminutes)),
+                                     labels = c("0", "45 minutes"),
+                                     space = 'Lab',
+                                     na.value = 'white',
+                                     guide = 'colourbar') +
     
-       ggplot2::geom_vline(xintercept = 0,
-                           colour = 'black')
+#      ggplot2::geom_tile(ggplot2::aes(fill = scaledotminutes),
+#                       data = therapyrehabdays,
+#                       colour = "white") +
+    
+#       ggplot2::scale_fill_gradientn(low = "red",
+#                                     mid = "yellow",
+#                                     high = "green",
+#                                     space = 'Lab',
+#                                     na.value = 'grey80',
+#                                     midpoint = 0.5) +
+       ggplot2::geom_vline(xintercept = 0, colour = 'black')
 
   print(p)
   
